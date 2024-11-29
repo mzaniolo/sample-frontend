@@ -20,11 +20,13 @@ const props = defineProps({
         top: -5px;
         height: fit-content;
         width: 100%;
-        position: relative;
+        position: absolute;
+        color: var(--background);
+        font-weight: bold;
+        font-size: 100%;
     }
   }
   .term {
-      background-color: black;
       width: 10%;
       height: calc(100% / 3);
       left: 45%;
@@ -39,7 +41,7 @@ const props = defineProps({
 
 <template>
   <div class="src" >
-    <div class="body" :style="e ? 'background-color:  var(--on); border-color: var(--on-brd)':'background-color:  var(--off); border-color: var(--off-brd)'"><p>~</p></div>
-    <div class="term" id="term_1" :style="e ? 'background-color:  var(--on-brd)':'background-color:  var(--off-brd)'"></div>
-    </div>
+    <div class="body" :style="e ? 'background-color:  var(--line-on); border-color: var(--line-on)':'background-color:  var(--off); border-color: var(--line-off)'"><p>~</p></div>
+    <div class="term" :style="e ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
+  </div>
 </template>

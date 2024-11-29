@@ -12,17 +12,34 @@ const props = defineProps({
       top: calc(100% / 3);
       position: absolute;
       border-width: 2px;
-      border-color: black;
       border-style: solid;
       border-radius: 50%;
+      border-color: transparent;
   }
 
   .term {
-      background-color: black;
-      width: 10%;
+      width: 15%;
       height: calc(100% / 3);
-      left: 45%;
+      left: 42.5%;
       position: absolute;
+  }
+
+  .middle_on {
+    width: 15%;
+    height: calc(100% / 3);
+    top: calc(100% / 3);
+    left: 42.5%;
+    position: absolute;
+    background-color: rgb(55,55,55);
+  }
+
+  .middle_off {
+    width: 100%;
+    height: 5%;
+    top: 47%;
+    left: 0%;
+    position: absolute;
+    background-color: var(--off-brd);
   }
 
   #term_1 {
@@ -41,8 +58,9 @@ const props = defineProps({
 
 <template>
   <div class="sec" >
-    <div class="body" :style="(state.term && state.close) ? 'background-color:  var(--on); border-color: var(--on-brd)':'background-color:  var(--off); border-color: var(--off-brd)'"></div>
-    <div class="term" id="term_1" :style="state.term ? 'background-color:  var(--on-brd)':'background-color:  var(--off-brd)'"></div>
-    <div class="term" id="term_2" :style="(state.term && state.close) ? 'background-color:  var(--on-brd)':'background-color:  var(--off-brd)'"></div>
+    <div class="body" :style="state.close ? 'background-color:  var(--sec-on);':'background-color:  var(--off)'"></div>
+    <div class="term" id="term_1" :style="state.term_1 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
+    <div class="term" id="term_2" :style="state.term_2 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
+    <div :class="state.close ? 'middle_on' : 'middle_off'"></div>
   </div>
 </template>

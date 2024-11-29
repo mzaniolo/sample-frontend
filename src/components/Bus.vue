@@ -10,15 +10,14 @@ const props = defineProps({
     height: 1%;
     position: relative;
     border-width: 2px;
-    border-color: black;
     border-style: solid;
-    border-radius: 15%;
+    border-radius: 0%;
 }
 
 
 </style>
 
 <template>
-  <div class="bus"  :style="e ? 'background-color:  var(--on); border-color: var(--on-brd)':'background-color:  var(--off); border-color: var(--off-brd)'">
+  <div class="bus"  :style="e ? 'background-color:  var(--line-on); border-color: var(--line-on)':'background-color:  var(---line-off); border-color: var(--line-off)'">
   </div>
 </template>
