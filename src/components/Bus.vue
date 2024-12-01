@@ -18,6 +18,6 @@ const props = defineProps({
 </style>
 
 <template>
-  <div class="bus"  :style="e ? 'background-color:  var(--line-on); border-color: var(--line-on)':'background-color:  var(---line-off); border-color: var(--line-off)'">
+  <div class="bus"  :style="e ? 'background-color:  var(--line-on); border-color: var(--line-on)':'background-color:  var(--line-off); border-color: var(--line-off)'">
   </div>
 </template>

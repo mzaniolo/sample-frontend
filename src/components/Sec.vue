@@ -1,6 +1,7 @@
 <script setup>
 const props = defineProps({
   state: Object,
+  name: String,
 })
 </script>
 
@@ -58,9 +59,9 @@ const props = defineProps({
 
 <template>
   <div class="sec" >
-    <div class="body" :style="state.close ? 'background-color:  var(--sec-on);':'background-color:  var(--off)'"></div>
-    <div class="term" id="term_1" :style="state.term_1 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
-    <div class="term" id="term_2" :style="state.term_2 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
-    <div :class="state.close ? 'middle_on' : 'middle_off'"></div>
+    <div class="body" :style="state[name].close ? 'background-color:  var(--sec-on);':'background-color:  var(--off)'"></div>
+    <div class="term" id="term_1" :style="state[name].term_1 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
+    <div class="term" id="term_2" :style="state[name].term_2 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
+    <div :class="state[name].close ? 'middle_on' : 'middle_off'"></div>
   </div>
 </template>

@@ -2,9 +2,10 @@
 import Breaker from './Breaker.vue'
 import Sec from './Sec.vue'
 const props = defineProps({
-  brk_1: Object,
-  brk_2: Object,
-  sec: Object,
+  brk_1: String,
+  brk_2: String,
+  sec: String,
+  state: Object
 })
 </script>
 
@@ -36,8 +37,8 @@ const props = defineProps({
 
 <template>
   <div class="grp">
-    <Breaker id="brk_1" :state="brk_1"></Breaker>
-    <Sec  id="sec" :state="sec"></Sec>
-    <Breaker id="brk_2" :state="brk_2"></Breaker>
+    <Breaker id="brk_1" :state="state" :name="brk_1"></Breaker>
+    <Sec  id="sec" :state="state" :name="sec"></Sec>
+    <Breaker id="brk_2" :state="state" :name="brk_2"></Breaker>
   </div>
 </template>
