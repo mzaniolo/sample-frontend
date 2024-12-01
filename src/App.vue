@@ -139,36 +139,38 @@ const client = createClient({
 </script>
 
 <template>
-  <header>
-   <h1 style="text-align: center;">Demo Substation</h1>
-  </header>
+  <div id="grid_container">
+    <header>
+    <h1 style="text-align: center;">Demo Substation</h1>
+    </header>
 
-  <main>
-    <sec_brk id="sec_brk_1" brk_1="brk_10" brk_2="brk_11" sec="sec_1" :state="ref_state" ></sec_brk>
-    <sec_brk id="sec_brk_3" brk_1="brk_30" brk_2="brk_31" sec="sec_3" :state="ref_state"></sec_brk>
-    <V_line id="l_3" :e="ref_state.brk_30.term_1"></V_line>
-    <Bus  id="bus_1" :e="ref_state.brk_30.term_1 || ref_state.brk_11.term_2 "></Bus>
+    <main>
+      <sec_brk id="sec_brk_1" brk_1="brk_10" brk_2="brk_11" sec="sec_1" :state="ref_state" ></sec_brk>
+      <sec_brk id="sec_brk_3" brk_1="brk_30" brk_2="brk_31" sec="sec_3" :state="ref_state"></sec_brk>
+      <V_line id="l_3" :e="ref_state.brk_30.term_1"></V_line>
+      <Bus  id="bus_1" :e="ref_state.brk_30.term_1 || ref_state.brk_11.term_2 "></Bus>
 
 
-    <sec_brk id="sec_brk_2" brk_1="brk_20" brk_2="brk_21" sec="sec_2" :state="ref_state"></sec_brk>
-    <V_line id="l_2" :e="ref_state.brk_21.term_1 && ref_state.brk_21.close"></V_line>
-    <sec_brk id="sec_brk_4" brk_1="brk_40" brk_2="brk_41" sec="sec_4" :state="ref_state"></sec_brk>
-    <Bus  id="bus_2" :e="ref_state.brk_40.term_1 || ref_state.brk_21.term_2 "></Bus>
+      <sec_brk id="sec_brk_2" brk_1="brk_20" brk_2="brk_21" sec="sec_2" :state="ref_state"></sec_brk>
+      <V_line id="l_2" :e="ref_state.brk_21.term_1 && ref_state.brk_21.close"></V_line>
+      <sec_brk id="sec_brk_4" brk_1="brk_40" brk_2="brk_41" sec="sec_4" :state="ref_state"></sec_brk>
+      <Bus  id="bus_2" :e="ref_state.brk_40.term_1 || ref_state.brk_21.term_2 "></Bus>
 
-    <Breaker id="brk_d" name="brk_d" :state="ref_state"></Breaker>
-    <V_line id="l_34" :e="ref_state.brk_d.term_1"></V_line>
-    <V_line id="l_12" :e="ref_state.brk_10.term_1"></V_line>
+      <Breaker id="brk_d" name="brk_d" :state="ref_state"></Breaker>
+      <V_line id="l_34" :e="ref_state.brk_d.term_1"></V_line>
+      <V_line id="l_12" :e="ref_state.brk_10.term_1"></V_line>
 
-    <src id="src" e></src>
+      <src id="src" e></src>
 
-  </main>
+    </main>
 
-  <div>
-    <h3>Top 10 last alarms</h3>
-    <p>name - value - state - ack - severity - timestamp</p>
-    <li v-for="item in alms.reverse()">
-    {{ item.name }} - {{ item.value }} - {{ item.state }} - {{ item.ack }} - {{ item.severity }} - {{ item.timestamp }}
-  </li>
+    <div id="alarms">
+      <h3>Top 10 last alarms</h3>
+      <p>name - value - state - ack - severity - timestamp</p>
+      <li v-for="item in alms.reverse()">
+        {{ item.name }} - {{ item.value }} - {{ item.state }} - {{ item.ack }} - {{ item.severity }} - {{ item.timestamp }}
+      </li>
+    </div>
   </div>
 </template>
 
@@ -305,6 +307,7 @@ const client = createClient({
 
 header {
   line-height: 1.5;
+  grid-area: header;
 }
 
 main{
@@ -313,8 +316,25 @@ main{
   height: calc(var(--scale)*30);
   width: calc(var(--scale)*20);
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  /* left: 50%;
+  transform: translateX(-50%); */
+  grid-area: main;
+}
+
+#alarms {
+  grid-area: alarm;
+  font-size: small;
+}
+
+#grid_container{
+  display: grid;
+  width: 100%;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "header header"
+    "main alarm "
+    "main alarm";
 }
 
 </style>
