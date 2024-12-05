@@ -17,7 +17,7 @@ const props = defineProps({
     position: relative;
 
     p{
-        top: -5px;
+        top: -35%;
         height: fit-content;
         width: 100%;
         position: absolute;

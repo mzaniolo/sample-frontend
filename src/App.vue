@@ -197,8 +197,8 @@ const client = createClient({
 
 #src{
     top: 1.6%;
-    left: 150px;
-    height: 30px;
+    left: 37.5%;
+    height: calc(var(--scale)*1.5);
     width: var(--brk-w);
   }
   #brk_1 {
@@ -220,45 +220,45 @@ const client = createClient({
     height: calc(100% / 3);
   }
 #sec_brk_1{
-  top: 40px;
-  left: 100px;
+  top: calc(10%/3 *2);
+  left: 25%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
 
   }
   #sec_brk_2{
-  top: 40px;
-  left: 200px;
+  top: calc(10%/3 *2);
+  left: 50%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
   }
   #sec_brk_3{
-  top: 280px;
-  left: 150px;
+  top: calc(40% + 10%/3 * 2);
+  left: 37.5%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
   }
   #sec_brk_4{
-  top: 280px;
-  left: 250px;
+  top: calc(40% + 10%/3 * 2);
+  left: 62.5%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
   }
 
   #bus_1{
-    left: 30px;
-    top: 220px;
+    left: 7.5%;
+    top: calc(30% + 10%/3 * 2);
     width: calc(var(--brk-w)*15);
     position: absolute;
   }
 
   #bus_2{
-    left: 30px;
-    top: 280px;
+    left: 7.5%;
+    top: calc(40% + 10%/3 * 2);
     width: calc(var(--brk-w)*15);
     position: absolute;
   }
@@ -266,39 +266,39 @@ const client = createClient({
   #brk_d{
     height: var(--brk-h);
     width:  var(--brk-w);
-    top: 460px;
-    left: 200px;
+    top: calc(70% + 10%/3 * 2);
+    left: 50%;
     position: absolute;
   }
 
   #l_34{
-    width: 102px;
+    width: 25.5%;
     height: calc(1%/3);
-    top: 460px;
-    left: 159px;
+    top: calc(70% + 10%/3 * 2);
+    left: 39.75%;
     position: absolute;
   }
   #l_12{
-    width: 102px;
+    width: 25.5%;
     height: calc(1%/3);
-    top: 38px;
-    left: 109px;
+    top: calc(6% + 1%/3);
+    left: 27.25%;
     position: absolute;
   }
 
   #l_2{
-    width: 2px;
-    height: 60px;
-    top: 220px;
-    left: 209px;
+    width: 0.75%;
+    height: 10%;
+    top: calc(30% + 10%/3 * 2);
+    left: 52.25%;
     position: absolute;
   }
 
   #l_3{
-    width: 2px;
-    height: 60px;
-    top: 220px;
-    left: 159px;
+    width: 0.75%;
+    height: 10%;
+    top: calc(30% + 10%/3 * 2);
+    left: 39.75%;
     position: absolute;
   }
 
@@ -319,11 +319,15 @@ main{
   /* left: 50%;
   transform: translateX(-50%); */
   grid-area: main;
+  justify-self: right;
+  padding: 15px;
 }
 
 #alarms {
   grid-area: alarm;
   font-size: small;
+  justify-self: left;
+  padding: 15px;
 }
 
 #grid_container{
