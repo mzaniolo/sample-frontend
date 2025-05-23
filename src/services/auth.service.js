@@ -69,6 +69,17 @@ class AuthService {
         }
     }
 
+    // Get the user's profile
+    async getProfile() {
+        try {
+            const user = await this.getUser()
+            return user?.profile
+        } catch (error) {
+            console.error('Error getting profile:', error)
+            return null
+        }
+    }
+
     // Get the access token
     async getAccessToken() {
         try {

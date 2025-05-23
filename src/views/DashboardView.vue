@@ -10,8 +10,7 @@ import { request } from 'graphql-request';
 import { SUBS_MEAS, SUBS_ALM, ALM_ACK } from "@/subscription";
 import { Node_1, Node_2, TopProc } from '../topological_processor';
 import authService from '../services/auth.service';
-
-
+import { useRouter } from 'vue-router';
 
 var state = {"brk_10": {"close": false, "term_1": true, "term_2": true},
   "brk_11": {"close": false, "term_1": true, "term_2": true},
@@ -155,6 +154,9 @@ top_proc.calculate(state);
 
 const ref_state = shallowRef({...state});
 
+const router = useRouter()
+const username = ref('')
+
 // Initialize WebSocket connection with access token
 const initializeWebSocket = async () => {
   try {
@@ -273,15 +275,38 @@ const acknowledgeAlarm = async (almName) => {
 }
 
 // Initialize when component is mounted
-onMounted(() => {
+onMounted(async () => {
   initializeWebSocket()
+  // Get username from auth service
+  try {
+    const profile = await authService.getProfile()
+    username.value = profile?.name || 'User'
+  } catch (error) {
+    console.error('Error fetching profile:', error)
+    username.value = 'User'
+  }
 })
+
+const handleLogout = async () => {
+  try {
+    await authService.logout()
+    router.push('/login')
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
+}
 </script>
 
 <template>
   <div id="grid_container">
     <header>
-      <h1 style="text-align: center;">Demo Substation</h1>
+      <div class="header-content">
+        <h1>Demo Substation</h1>
+        <div class="user-section">
+          <span class="username">{{ username }}</span>
+          <button @click="handleLogout" class="logout-button">Logout</button>
+        </div>
+      </div>
     </header>
 
     <main>
@@ -356,6 +381,10 @@ onMounted(() => {
   --off: rgb(28, 28, 28);
   --off-brd: rgb(61,61,61);
   --sec-on: rgb(35,35,35);
+  --header-bg: rgb(25, 25, 25);
+  --page-bg: rgb(70, 70, 70);
+  --alarm-bg: rgb(45, 45, 45);
+  --alarm-hover: rgb(55, 55, 55);
 
   --line-on: rgb(69, 71, 53);
   --line-off: rgb(41, 41, 41);
@@ -369,6 +398,15 @@ onMounted(() => {
   --sec-h: calc(var(--scale)*3);
   --brk-w: var(--scale);
   --sec-w: var(--scale);
+}
+
+/* Reset default margins and ensure dark background */
+:root, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--page-bg);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 #grid_container{
@@ -399,6 +437,8 @@ main{
   min-width: 300px;
   max-width: 90vw;
   max-height: 90vh;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 #alarms {
@@ -413,6 +453,9 @@ main{
   overflow: hidden;
   min-width: 300px;
   margin-left: 20px;
+  background-color: var(--background);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 #src{
@@ -511,6 +554,53 @@ main{
 header {
   line-height: 1.5;
   grid-area: header;
+  width: 100%;
+  background-color: var(--header-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+}
+
+.header-content h1 {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: #e0e0e0;
+  font-size: 1rem;
+}
+
+.logout-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--on);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: var(--line-on);
 }
 
 .alarms-header {
@@ -521,6 +611,15 @@ header {
   flex-shrink: 0;
 }
 
+.alarms-header h3 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .alarms-list {
   flex: 1;
   overflow-y: auto;
@@ -528,6 +627,7 @@ header {
   border-radius: 4px;
   padding: 8px;
   min-height: 0;
+  background-color: var(--alarm-bg);
 }
 
 .clear-button {
@@ -554,14 +654,17 @@ header {
   display: flex;
   gap: 0;
   align-items: center;
+  color: #ffffff;
+  background-color: var(--alarm-bg);
 }
 
 .alarm-item:hover {
-  background-color: var(--on);
+  background-color: var(--alarm-hover);
 }
 
 .alarm-item.acknowledged {
-  opacity: 0.7;
+  opacity: 0.6;
+  color: #a0a0a0;
 }
 
 .alarm-field {
@@ -579,9 +682,12 @@ header {
   margin-bottom: 8px;
   position: sticky;
   top: 0;
-  background-color: var(--sec-on);
+  background-color: var(--alarm-bg);
   z-index: 1;
-  color: #e0e0e0;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
 }
 
 .header-cell {
@@ -623,18 +729,22 @@ body.resizing {
   position: relative;
   padding-right: 16px;
   transition: color 0.2s;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .sortable:hover {
   color: #ffffff;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 .sortable::after {
   content: '↕';
   position: absolute;
   right: 0;
-  opacity: 0.7;
-  color: #a0a0a0;
+  opacity: 0.9;
+  color: #ffffff;
+  font-weight: normal;
 }
 
 .sortable[data-sort="asc"]::after {
@@ -647,25 +757,5 @@ body.resizing {
   content: '↓';
   opacity: 1;
   color: #ffffff;
-}
-
-.alarm-item {
-  display: flex;
-  gap: 0;
-  padding: 6px 4px;
-  margin: 2px 0;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-  align-items: center;
-  color: #d0d0d0;
-}
-
-.alarm-item:hover {
-  background-color: var(--sec-on);
-}
-
-.alarm-item.acknowledged {
-  opacity: 0.6;
-  color: #a0a0a0;
 }
 </style>

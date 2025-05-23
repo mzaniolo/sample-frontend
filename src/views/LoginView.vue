@@ -37,7 +37,10 @@ const handleLogin = async () => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  width: 100vw;
   background-color: var(--background);
+  margin: 0;
+  padding: 0;
 }
 
 .login-box {
@@ -47,6 +50,7 @@ const handleLogin = async () => {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+  margin: 0 20px;
 }
 
 h1 {
@@ -69,5 +73,17 @@ h1 {
 
 .login-button:hover {
   background-color: var(--line-on);
+}
+
+/* Reset default margins and padding */
+:root {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 </style>
