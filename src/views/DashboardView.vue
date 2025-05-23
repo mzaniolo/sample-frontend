@@ -36,6 +36,41 @@ const alms = shallowRef({})
 const client = ref(null)
 const sortField = ref('timestamp')
 const sortDirection = ref('desc')
+const columnWidths = ref({
+  name: 200,
+  value: 100,
+  state: 100,
+  ack: 100,
+  severity: 100,
+  timestamp: 200
+})
+
+const isResizing = ref(false)
+const currentResizer = ref(null)
+const startX = ref(0)
+const startWidth = ref(0)
+
+const startResize = (e, column) => {
+  isResizing.value = true
+  currentResizer.value = column
+  startX.value = e.pageX
+  startWidth.value = columnWidths.value[column]
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', stopResize)
+}
+
+const handleMouseMove = (e) => {
+  if (!isResizing.value) return
+  const diff = e.pageX - startX.value
+  columnWidths.value[currentResizer.value] = Math.max(50, startWidth.value + diff)
+}
+
+const stopResize = () => {
+  isResizing.value = false
+  currentResizer.value = null
+  document.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('mouseup', stopResize)
+}
 
 const sortedAlarms = computed(() => {
   const entries = Object.entries(alms.value)
@@ -269,28 +304,46 @@ onMounted(() => {
 
     <div id="alarms">
       <div class="alarms-header">
-        <h3>Top 10 last alarms</h3>
+        <h3>Last alarms</h3>
         <button @click="clearAlarms" class="clear-button">Clear Alarms</button>
       </div>
       <div class="alarms-list">
         <div class="alarm-header">
-          <span @click="sortBy('name')" class="alarm-field sortable" :data-sort="sortField === 'name' ? sortDirection : null">Name</span>
-          <span @click="sortBy('value')" class="alarm-field sortable" :data-sort="sortField === 'value' ? sortDirection : null">Value</span>
-          <span @click="sortBy('state')" class="alarm-field sortable" :data-sort="sortField === 'state' ? sortDirection : null">State</span>
-          <span @click="sortBy('ack')" class="alarm-field sortable" :data-sort="sortField === 'ack' ? sortDirection : null">Ack</span>
-          <span @click="sortBy('severity')" class="alarm-field sortable" :data-sort="sortField === 'severity' ? sortDirection : null">Severity</span>
-          <span @click="sortBy('timestamp')" class="alarm-field sortable" :data-sort="sortField === 'timestamp' ? sortDirection : null">Timestamp</span>
+          <div class="header-cell" :style="{ width: columnWidths.name + 'px' }">
+            <span @click="sortBy('name')" class="alarm-field sortable" :data-sort="sortField === 'name' ? sortDirection : null">Name</span>
+            <div class="resize-handle" @mousedown="(e) => startResize(e, 'name')"></div>
+          </div>
+          <div class="header-cell" :style="{ width: columnWidths.value + 'px' }">
+            <span @click="sortBy('value')" class="alarm-field sortable" :data-sort="sortField === 'value' ? sortDirection : null">Value</span>
+            <div class="resize-handle" @mousedown="(e) => startResize(e, 'value')"></div>
+          </div>
+          <div class="header-cell" :style="{ width: columnWidths.state + 'px' }">
+            <span @click="sortBy('state')" class="alarm-field sortable" :data-sort="sortField === 'state' ? sortDirection : null">State</span>
+            <div class="resize-handle" @mousedown="(e) => startResize(e, 'state')"></div>
+          </div>
+          <div class="header-cell" :style="{ width: columnWidths.ack + 'px' }">
+            <span @click="sortBy('ack')" class="alarm-field sortable" :data-sort="sortField === 'ack' ? sortDirection : null">Ack</span>
+            <div class="resize-handle" @mousedown="(e) => startResize(e, 'ack')"></div>
+          </div>
+          <div class="header-cell" :style="{ width: columnWidths.severity + 'px' }">
+            <span @click="sortBy('severity')" class="alarm-field sortable" :data-sort="sortField === 'severity' ? sortDirection : null">Severity</span>
+            <div class="resize-handle" @mousedown="(e) => startResize(e, 'severity')"></div>
+          </div>
+          <div class="header-cell" :style="{ width: columnWidths.timestamp + 'px' }">
+            <span @click="sortBy('timestamp')" class="alarm-field sortable" :data-sort="sortField === 'timestamp' ? sortDirection : null">Timestamp</span>
+            <div class="resize-handle" @mousedown="(e) => startResize(e, 'timestamp')"></div>
+          </div>
         </div>
         <li v-for="(item, name) in sortedAlarms"
             @click="acknowledgeAlarm(item[1].name)"
             :class="{ 'acknowledged': item[1].ack }"
             class="alarm-item">
-          <span class="alarm-field">{{ item[1].name }}</span>
-          <span class="alarm-field">{{ item[1].value }}</span>
-          <span class="alarm-field">{{ item[1].state }}</span>
-          <span class="alarm-field">{{ item[1].ack }}</span>
-          <span class="alarm-field">{{ item[1].severity }}</span>
-          <span class="alarm-field">{{ item[1].timestamp }}</span>
+          <div class="alarm-cell" :style="{ width: columnWidths.name + 'px' }">{{ item[1].name }}</div>
+          <div class="alarm-cell" :style="{ width: columnWidths.value + 'px' }">{{ item[1].value }}</div>
+          <div class="alarm-cell" :style="{ width: columnWidths.state + 'px' }">{{ item[1].state }}</div>
+          <div class="alarm-cell" :style="{ width: columnWidths.ack + 'px' }">{{ item[1].ack }}</div>
+          <div class="alarm-cell" :style="{ width: columnWidths.severity + 'px' }">{{ item[1].severity }}</div>
+          <div class="alarm-cell" :style="{ width: columnWidths.timestamp + 'px' }">{{ item[1].timestamp }}</div>
         </li>
       </div>
     </div>
@@ -309,164 +362,155 @@ onMounted(() => {
 
   --background: rgb(30, 30, 30);
 
-  --scale: 20px;
-
+  --scale: min(2.5vw, 2.5vh);
+  --main-width: calc(var(--scale) * 20);
+  --main-height: calc(var(--scale) * 30);
   --brk-h: calc(var(--scale)*3);
   --sec-h: calc(var(--scale)*3);
-
   --brk-w: var(--scale);
   --sec-w: var(--scale);
 }
 
+#grid_container{
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto;
+  grid-template-areas:
+    "header header"
+    "main alarm "
+    "main alarm";
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
+  align-items: start;
+}
+
+main{
+  background-color: var(--background);
+  margin-top: 10px;
+  height: var(--main-height);
+  width: var(--main-width);
+  position: relative;
+  grid-area: main;
+  justify-self: start;
+  padding: 15px;
+  margin-left: 20px;
+  min-width: 300px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+#alarms {
+  grid-area: alarm;
+  font-size: small;
+  justify-self: start;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  height: var(--main-height);
+  max-height: var(--main-height);
+  overflow: hidden;
+  min-width: 300px;
+  margin-left: 20px;
+}
+
 #src{
-    top: 1.6%;
-    left: 37.5%;
-    height: calc(var(--scale)*1.5);
-    width: var(--brk-w);
-  }
-  #brk_1 {
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: calc(100% / 3);
-  }
-  #sec {
-    top: calc(100% / 3);
-    left: 0px;
-    width: 100%;
-    height: calc(100% / 3);
-  }
-  #brk_2 {
-    top: calc((100% / 3)*2);
-    left: 0px;
-    width: 100%;
-    height: calc(100% / 3);
-  }
+  top: 1.6%;
+  left: 37.5%;
+  height: calc(var(--scale)*1.5);
+  width: var(--brk-w);
+}
+
 #sec_brk_1{
   top: calc(10%/3 *2);
   left: 25%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
+}
 
-  }
-  #sec_brk_2{
+#sec_brk_2{
   top: calc(10%/3 *2);
   left: 50%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
-  }
-  #sec_brk_3{
+}
+
+#sec_brk_3{
   top: calc(40% + 10%/3 * 2);
   left: 37.5%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
-  }
-  #sec_brk_4{
+}
+
+#sec_brk_4{
   top: calc(40% + 10%/3 * 2);
   left: 62.5%;
   height: calc(var(--brk-h)*3);
   width: var(--brk-w);
   position: absolute;
-  }
+}
 
-  #bus_1{
-    left: 7.5%;
-    top: calc(30% + 10%/3 * 2);
-    width: calc(var(--brk-w)*15);
-    position: absolute;
-  }
+#bus_1{
+  left: 7.5%;
+  top: calc(30% + 10%/3 * 2);
+  width: calc(var(--brk-w)*15);
+  position: absolute;
+}
 
-  #bus_2{
-    left: 7.5%;
-    top: calc(40% + 10%/3 * 2);
-    width: calc(var(--brk-w)*15);
-    position: absolute;
-  }
+#bus_2{
+  left: 7.5%;
+  top: calc(40% + 10%/3 * 2);
+  width: calc(var(--brk-w)*15);
+  position: absolute;
+}
 
-  #brk_d{
-    height: var(--brk-h);
-    width:  var(--brk-w);
-    top: calc(70% + 10%/3 * 2);
-    left: 50%;
-    position: absolute;
-  }
+#brk_d{
+  height: var(--brk-h);
+  width: var(--brk-w);
+  top: calc(70% + 10%/3 * 2);
+  left: 50%;
+  position: absolute;
+}
 
-  #l_34{
-    width: 25.5%;
-    height: calc(1%/3);
-    top: calc(70% + 10%/3 * 2);
-    left: 39.75%;
-    position: absolute;
-  }
-  #l_12{
-    width: 25.5%;
-    height: calc(1%/3);
-    top: calc(6% + 1%/3);
-    left: 27.25%;
-    position: absolute;
-  }
+#l_34{
+  width: 25.5%;
+  height: calc(1%/3);
+  top: calc(70% + 10%/3 * 2);
+  left: 39.75%;
+  position: absolute;
+}
 
-  #l_2{
-    width: 0.75%;
-    height: 10%;
-    top: calc(30% + 10%/3 * 2);
-    left: 52.25%;
-    position: absolute;
-  }
+#l_12{
+  width: 25.5%;
+  height: calc(1%/3);
+  top: calc(6% + 1%/3);
+  left: 27.25%;
+  position: absolute;
+}
 
-  #l_3{
-    width: 0.75%;
-    height: 10%;
-    top: calc(30% + 10%/3 * 2);
-    left: 39.75%;
-    position: absolute;
-  }
+#l_2{
+  width: 0.75%;
+  height: 10%;
+  top: calc(30% + 10%/3 * 2);
+  left: 52.25%;
+  position: absolute;
+}
 
-
-
+#l_3{
+  width: 0.75%;
+  height: 10%;
+  top: calc(30% + 10%/3 * 2);
+  left: 39.75%;
+  position: absolute;
+}
 
 header {
   line-height: 1.5;
   grid-area: header;
-}
-
-main{
-  background-color: var(--background);
-  margin-top: 10px;
-  height: calc(var(--scale)*30);
-  width: calc(var(--scale)*20);
-  position: relative;
-  /* left: 50%;
-  transform: translateX(-50%); */
-  grid-area: main;
-  justify-self: right;
-  padding: 15px;
-}
-
-#alarms {
-  grid-area: alarm;
-  font-size: small;
-  justify-self: left;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  height: calc(var(--scale)*30);
-  max-height: calc(var(--scale)*30);
-  overflow: hidden;
-}
-
-#grid_container{
-  display: grid;
-  width: 100%;
-  grid-template-columns: 50% 50%;
-  grid-template-rows: auto;
-  grid-template-areas:
-    "header header"
-    "main alarm "
-    "main alarm";
 }
 
 .alarms-header {
@@ -507,9 +551,8 @@ main{
   margin: 2px 0;
   border-radius: 4px;
   transition: background-color 0.2s;
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
-  gap: 8px;
+  display: flex;
+  gap: 0;
   align-items: center;
 }
 
@@ -528,13 +571,50 @@ main{
 }
 
 .alarm-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
-  gap: 8px;
-  padding: 4px;
+  display: flex;
+  gap: 0;
+  padding: 8px 4px;
   font-weight: bold;
-  border-bottom: 1px solid var(--off-brd);
-  margin-bottom: 4px;
+  border-bottom: 2px solid var(--line-on);
+  margin-bottom: 8px;
+  position: sticky;
+  top: 0;
+  background-color: var(--sec-on);
+  z-index: 1;
+  color: #e0e0e0;
+}
+
+.header-cell {
+  position: relative;
+  padding-right: 16px;
+}
+
+.alarm-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 16px;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background-color: transparent;
+  transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+  background-color: var(--line-on);
+}
+
+/* Add cursor style when resizing */
+body.resizing {
+  cursor: col-resize;
+  user-select: none;
 }
 
 .sortable {
@@ -542,26 +622,50 @@ main{
   user-select: none;
   position: relative;
   padding-right: 16px;
+  transition: color 0.2s;
 }
 
 .sortable:hover {
-  color: var(--line-on);
+  color: #ffffff;
 }
 
 .sortable::after {
   content: '↕';
   position: absolute;
   right: 0;
-  opacity: 0.5;
+  opacity: 0.7;
+  color: #a0a0a0;
 }
 
 .sortable[data-sort="asc"]::after {
   content: '↑';
   opacity: 1;
+  color: #ffffff;
 }
 
 .sortable[data-sort="desc"]::after {
   content: '↓';
   opacity: 1;
+  color: #ffffff;
+}
+
+.alarm-item {
+  display: flex;
+  gap: 0;
+  padding: 6px 4px;
+  margin: 2px 0;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  align-items: center;
+  color: #d0d0d0;
+}
+
+.alarm-item:hover {
+  background-color: var(--sec-on);
+}
+
+.alarm-item.acknowledged {
+  opacity: 0.6;
+  color: #a0a0a0;
 }
 </style>

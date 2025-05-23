@@ -15,22 +15,36 @@ const props = defineProps({
     border-radius: 50%;
     text-align: center;
     position: relative;
-
-    p{
-        top: -35%;
-        height: fit-content;
-        width: 100%;
-        position: absolute;
-        color: var(--background);
-        font-weight: bold;
-        font-size: 100%;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
+  .wave {
+    width: 60%;
+    height: 30%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wave svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .wave path {
+    fill: var(--background);
+    stroke: var(--background);
+    stroke-width: 4;
+  }
+
   .term {
-      width: 10%;
-      height: calc(100% / 3);
-      left: 45%;
-      position: absolute;
+    width: 10%;
+    height: calc(100% / 3);
+    left: 45%;
+    position: absolute;
   }
 
   position: absolute;
@@ -40,8 +54,14 @@ const props = defineProps({
 </style>
 
 <template>
-  <div class="src" >
-    <div class="body" :style="e ? 'background-color:  var(--line-on); border-color: var(--line-on)':'background-color:  var(--off); border-color: var(--line-off)'"><p>~</p></div>
-    <div class="term" :style="e ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
+  <div class="src">
+    <div class="body" :style="e ? 'background-color: var(--line-on); border-color: var(--line-on)':'background-color: var(--off); border-color: var(--line-off)'">
+      <div class="wave">
+        <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+          <path d="M0,20 Q25,-20 50,20 T100,20" />
+        </svg>
+      </div>
+    </div>
+    <div class="term" :style="e ? 'background-color: var(--line-on)':'background-color: var(--line-off)'"></div>
   </div>
 </template>
