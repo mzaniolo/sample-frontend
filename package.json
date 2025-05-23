@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@vue/apollo-option": "^4.2.0",
+    "graphql-request": "^7.1.2",
     "graphql-ws": "^5.16.0",
     "oidc-client-ts": "^3.2.1",
     "vue": "^3.5.12",

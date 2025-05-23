@@ -4,11 +4,14 @@ import Bus from '../components/Bus.vue'
 import V_line from '../components/V_line.vue'
 import sec_brk from '../components/sec_brk.vue'
 import src from '../components/src.vue'
-import {ref, shallowRef,  onMounted} from "vue"
+import {ref, shallowRef,  onMounted, computed} from "vue"
 import { createClient } from 'graphql-ws';
-import { SUBS_MEAS, SUBS_ALM } from "@/subscription";
+import { request } from 'graphql-request';
+import { SUBS_MEAS, SUBS_ALM, ALM_ACK } from "@/subscription";
 import { Node_1, Node_2, TopProc } from '../topological_processor';
 import authService from '../services/auth.service';
+
+
 
 var state = {"brk_10": {"close": false, "term_1": true, "term_2": true},
   "brk_11": {"close": false, "term_1": true, "term_2": true},
@@ -29,8 +32,37 @@ var state = {"brk_10": {"close": false, "term_1": true, "term_2": true},
   "brk_d": {"close": false, "term_1": true, "term_2": true},
 };
 
-const alms = shallowRef([])
+const alms = shallowRef({})
 const client = ref(null)
+const sortField = ref('timestamp')
+const sortDirection = ref('desc')
+
+const sortedAlarms = computed(() => {
+  const entries = Object.entries(alms.value)
+  return entries.sort((a, b) => {
+    let valueA = a[1][sortField.value]
+    let valueB = b[1][sortField.value]
+
+    // Special handling for timestamp
+    if (sortField.value === 'timestamp') {
+      valueA = new Date(valueA)
+      valueB = new Date(valueB)
+    }
+
+    if (valueA < valueB) return sortDirection.value === 'asc' ? -1 : 1
+    if (valueA > valueB) return sortDirection.value === 'asc' ? 1 : -1
+    return 0
+  })
+})
+
+const sortBy = (field) => {
+  if (sortField.value === field) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortDirection.value = 'asc'
+  }
+}
 
 var brk10 = new Node_2("brk_10");
 var brk11 = new Node_2("brk_11");
@@ -123,7 +155,7 @@ const startSubscriptions = async () => {
         let name = event.data.tagSubscribe.name
         let value = event.data.tagSubscribe.value
         let timestamp = event.data.tagSubscribe.timestamp
-        console.log("name: ", name," value: ", value," timestamp: ", timestamp)
+        // console.log("name: ", name," value: ", value," timestamp: ", timestamp)
 
         state[name].close = Boolean(value)
         top_proc.calculate(state)
@@ -142,15 +174,26 @@ const startSubscriptions = async () => {
 
       for await (const event of subscription) {
         let name = event.data.almSubscribe.name
-        let value = event.data.almSubscribe.value
         let timestamp = event.data.almSubscribe.timestamp
-        console.log("alm - name: ", name," value: ", value," timestamp: ", timestamp)
 
-        // Create new array with the new alarm at the beginning
-        const new_alm = [event.data.almSubscribe, ...alms.value]
+        // If alarm is reset and acknowledged, and newer than existing one, remove it from the dictionary
+        if (event.data.almSubscribe.state === 'Reset' &&
+            event.data.almSubscribe.ack === 'Ack' &&
+            (!alms.value[name] || new Date(timestamp) > new Date(alms.value[name].timestamp))) {
+          const { [name]: removed, ...rest } = alms.value
+          alms.value = rest
+          console.log("alms 1: ", alms.value)
+          console.log("new alms: ", event.data.almSubscribe)
+          continue
+        }
 
-        // Keep only the first 10 alarms
-        alms.value = new_alm.slice(0, 10)
+        // Update alarm only if it's new or has a newer timestamp
+        if (!alms.value[name] || new Date(timestamp) > new Date(alms.value[name].timestamp)) {
+          alms.value = {
+            ...alms.value,
+            [name]: event.data.almSubscribe
+          }
+        }
       }
     } catch (error) {
       console.error('Error in alarms subscription:', error)
@@ -167,7 +210,31 @@ const startSubscriptions = async () => {
 }
 
 const clearAlarms = () => {
-  alms.value = []
+  alms.value = {}
+}
+
+const acknowledgeAlarm = async (almName) => {
+  try {
+    const accessToken = await authService.getAccessToken();
+    if (!accessToken) {
+      console.error('No access token available');
+      return;
+    }
+
+    const result = await request({
+      url: 'https://api.scada.mzaniolo.net/',
+      document: ALM_ACK,
+      variables: {
+        almName: almName
+      },
+      requestHeaders: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    // console.log('Alarm acknowledged:', result);
+  } catch (error) {
+    console.error('Error acknowledging alarm:', error);
+  }
 }
 
 // Initialize when component is mounted
@@ -205,10 +272,27 @@ onMounted(() => {
         <h3>Top 10 last alarms</h3>
         <button @click="clearAlarms" class="clear-button">Clear Alarms</button>
       </div>
-      <p>name - value - state - ack - severity - timestamp</p>
-      <li v-for="item in alms.reverse()">
-        {{ item.name }} - {{ item.value }} - {{ item.state }} - {{ item.ack }} - {{ item.severity }} - {{ item.timestamp }}
-      </li>
+      <div class="alarms-list">
+        <div class="alarm-header">
+          <span @click="sortBy('name')" class="alarm-field sortable" :data-sort="sortField === 'name' ? sortDirection : null">Name</span>
+          <span @click="sortBy('value')" class="alarm-field sortable" :data-sort="sortField === 'value' ? sortDirection : null">Value</span>
+          <span @click="sortBy('state')" class="alarm-field sortable" :data-sort="sortField === 'state' ? sortDirection : null">State</span>
+          <span @click="sortBy('ack')" class="alarm-field sortable" :data-sort="sortField === 'ack' ? sortDirection : null">Ack</span>
+          <span @click="sortBy('severity')" class="alarm-field sortable" :data-sort="sortField === 'severity' ? sortDirection : null">Severity</span>
+          <span @click="sortBy('timestamp')" class="alarm-field sortable" :data-sort="sortField === 'timestamp' ? sortDirection : null">Timestamp</span>
+        </div>
+        <li v-for="(item, name) in sortedAlarms"
+            @click="acknowledgeAlarm(item[1].name)"
+            :class="{ 'acknowledged': item[1].ack }"
+            class="alarm-item">
+          <span class="alarm-field">{{ item[1].name }}</span>
+          <span class="alarm-field">{{ item[1].value }}</span>
+          <span class="alarm-field">{{ item[1].state }}</span>
+          <span class="alarm-field">{{ item[1].ack }}</span>
+          <span class="alarm-field">{{ item[1].severity }}</span>
+          <span class="alarm-field">{{ item[1].timestamp }}</span>
+        </li>
+      </div>
     </div>
   </div>
 </template>
@@ -367,6 +451,11 @@ main{
   font-size: small;
   justify-self: left;
   padding: 15px;
+  display: flex;
+  flex-direction: column;
+  height: calc(var(--scale)*30);
+  max-height: calc(var(--scale)*30);
+  overflow: hidden;
 }
 
 #grid_container{
@@ -385,6 +474,16 @@ main{
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.alarms-list {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid var(--off-brd);
+  border-radius: 4px;
+  padding: 8px;
+  min-height: 0;
 }
 
 .clear-button {
@@ -400,5 +499,69 @@ main{
 
 .clear-button:hover {
   background-color: var(--line-on);
+}
+
+.alarm-item {
+  cursor: pointer;
+  padding: 4px;
+  margin: 2px 0;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.alarm-item:hover {
+  background-color: var(--on);
+}
+
+.alarm-item.acknowledged {
+  opacity: 0.7;
+}
+
+.alarm-field {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alarm-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 2fr;
+  gap: 8px;
+  padding: 4px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--off-brd);
+  margin-bottom: 4px;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 16px;
+}
+
+.sortable:hover {
+  color: var(--line-on);
+}
+
+.sortable::after {
+  content: '↕';
+  position: absolute;
+  right: 0;
+  opacity: 0.5;
+}
+
+.sortable[data-sort="asc"]::after {
+  content: '↑';
+  opacity: 1;
+}
+
+.sortable[data-sort="desc"]::after {
+  content: '↓';
+  opacity: 1;
 }
 </style>

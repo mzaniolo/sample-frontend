@@ -35,3 +35,8 @@ export const GET_ALM = `
   alm{name,timestamp,value}
 }
 `;
+
+export const ALM_ACK = `
+mutation AlmAck($almName: String!) {
+    almAck(almName: $almName)
+}`;
