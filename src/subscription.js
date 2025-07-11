@@ -2,17 +2,11 @@
 
 export const SUBS_MEAS = `
 subscription{
-  tagSubscribe(tag: "main") {
-        ... on DiscreteMeasurement {
-            name
-            timestamp
-            value
-        }
-        ... on AnalogicalMeasurement {
-            name
-            timestamp
-            value
-        }
+  tagSubscribe(equipment: ["eqp"], tags: ["main"]) {
+        name
+        timestamp
+        type
+        value
     }
 }
 `;

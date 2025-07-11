@@ -1,9 +1,20 @@
+// Helper function to get the base URL dynamically
+const getBaseUrl = () => {
+    // In development, use localhost
+    if (import.meta.env.DEV) {
+        return 'http://localhost:5173'
+    }
+
+    // In production, use the current origin
+    return window.location.origin + (import.meta.env.BASE_URL || '')
+}
+
 export const authConfig = {
     // OIDC Provider configuration
     authority: 'https://zitadel.scada.mzaniolo.net', // Replace with your Keycloak realm URL
     client_id: '321035155483469052', // Replace with your client ID
-    redirect_uri: 'http://localhost:5173/callback', // Must match the redirect URI in your OIDC provider
-    post_logout_redirect_uri: 'http://localhost:5173',
+    redirect_uri: `${getBaseUrl()}/#/callback`, // Dynamic redirect URI
+    post_logout_redirect_uri: getBaseUrl(), // Dynamic post-logout redirect
 
     // PKCE configuration
     response_type: 'code',
@@ -12,7 +23,7 @@ export const authConfig = {
     // Additional settings
     loadUserInfo: true,
     automaticSilentRenew: true,
-    silent_redirect_uri: 'http://localhost:5173/silent-renew.html',
+    silent_redirect_uri: `${getBaseUrl()}/silent-renew.html`,
 
     // Token configuration
     includeIdToken: true,
