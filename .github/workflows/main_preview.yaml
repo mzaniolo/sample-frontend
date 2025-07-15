@@ -1,0 +1,31 @@
+name: Deploy previews for main branch
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: preview-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build -- --base=/sample-frontend/main
+
+      - name: Preview Pages
+        uses: rajyan/preview-pages@v1
+        with:
+          source-dir: ./dist/
+          target-dir: ./main

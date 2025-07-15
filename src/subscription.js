@@ -2,8 +2,9 @@
 
 export const SUBS_MEAS = `
 subscription{
-  tagSubscribe(equipment: ["eqp"], tags: ["main"]) {
+  tagSubscribe(equipmentRegex: "sample_substation.*", tags: ["main"]) {
         name
+        equipment
         timestamp
         type
         value

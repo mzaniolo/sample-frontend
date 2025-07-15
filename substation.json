@@ -1,0 +1,265 @@
+{
+    "$schema": "https://config.scada.mzaniolo.net/config_schema",
+    "sample_substation": {
+        "measurements": [
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_10",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "1"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_11",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "2"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.sec_1",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "3"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_20",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "4"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_21",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "5"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.sec_2",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "6"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_30",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "7"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_31",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "8"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.sec_3",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "9"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_40",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "10"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_41",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "11"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.sec_4",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "12"
+                }
+            },
+            {
+                "name": "pos",
+                "type": "discrete",
+                "store": true,
+                "equipment": "sample_substation.brk_d",
+                "tags": [
+                    "main"
+                ],
+                "driver": {
+                    "type": "discrete",
+                    "addr": "13"
+                }
+            }
+        ],
+        "alarms": [
+            {
+                "name": "trip_brk_10",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_10::pos"
+            },
+            {
+                "name": "trip_brk_11",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_11::pos"
+            },
+            {
+                "name": "trip_brk_20",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_20::pos"
+            },
+            {
+                "name": "trip_brk_21",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_21::pos"
+            },
+            {
+                "name": "trip_brk_30",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_30::pos"
+            },
+            {
+                "name": "trip_brk_31",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_31::pos"
+            },
+            {
+                "name": "trip_brk_40",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_40::pos"
+            },
+            {
+                "name": "trip_brk_41",
+                "type": "digital",
+                "set": 0,
+                "reset": 1,
+                "severity": "high",
+                "meas": "sample_substation.brk_41::pos"
+            }
+        ],
+        "commands": [
+            {
+                "name": "pos.open",
+                "equipment": "sample_substation.brk_10",
+                "timeout": "5",
+                "driver": {
+                    "type": "discrete",
+                    "addr": "1024:BI:0",
+                    "value": 1,
+                    "select_addr": "",
+                    "select_value": 1
+                }
+            },
+            {
+                "name": "power",
+                "equipment": "sample_substation.brk_10",
+                "timeout": "5",
+                "driver": {
+                    "type": "analogical",
+                    "addr": "1024:BI:0"
+                }
+            }
+        ]
+    }
+}

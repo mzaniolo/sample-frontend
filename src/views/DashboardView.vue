@@ -190,11 +190,14 @@ const startSubscriptions = async () => {
 
       for await (const event of subscription) {
         let name = event.data.tagSubscribe.name
+        let equipment = event.data.tagSubscribe.equipment.replace("sample_substation.", "")
         let value = event.data.tagSubscribe.value
         let timestamp = event.data.tagSubscribe.timestamp
-        // console.log("name: ", name," value: ", value," timestamp: ", timestamp)
+        console.log("equipment: ", equipment, "name: ", name," value: ", value," timestamp: ", timestamp)
 
-        state[name].close = Boolean(value)
+        if (name === "pos") {
+          state[equipment].close = Boolean(value)
+        }
         top_proc.calculate(state)
         ref_state.value = {...state}
       }
@@ -316,7 +319,7 @@ const handleLogout = async () => {
       <Bus id="bus_1" :e="ref_state.brk_30.term_1 || ref_state.brk_11.term_2"></Bus>
 
       <sec_brk id="sec_brk_2" brk_1="brk_20" brk_2="brk_21" sec="sec_2" :state="ref_state"></sec_brk>
-      <V_line id="l_2" :e="ref_state.brk_21.term_1 && ref_state.brk_21.close"></V_line>
+      <V_line id="l_2" :e="ref_state.brk_21.term_2"></V_line>
       <sec_brk id="sec_brk_4" brk_1="brk_40" brk_2="brk_41" sec="sec_4" :state="ref_state"></sec_brk>
       <Bus id="bus_2" :e="ref_state.brk_40.term_1 || ref_state.brk_21.term_2"></Bus>
 
@@ -405,8 +408,9 @@ const handleLogout = async () => {
   margin: 0;
   padding: 0;
   background-color: var(--page-bg);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 #grid_container{
@@ -420,8 +424,9 @@ const handleLogout = async () => {
     "main alarm";
   gap: 20px;
   padding: 20px;
-  min-height: 100vh;
+  height: 100vh;
   align-items: start;
+  box-sizing: border-box;
 }
 
 main{
