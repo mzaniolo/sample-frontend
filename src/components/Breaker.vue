@@ -60,19 +60,24 @@ const props = defineProps({
     border-color: var(--off-brd)
   }
 
-
   position: absolute;
+  cursor: pointer;
 }
 
-
+/* Ensure tooltips are visible */
+.brk:hover {
+  z-index: 1000;
+  filter: brightness(1.2);
+}
 </style>
 
 <template>
-  <div class="brk" :name="name">
+  <div class="brk" :name="name" :title="name">
 
     <div class="body" :id="(state[name].term_1 && state[name].close) ? 'body_on':'body_off'"></div>
     <div class="term" id="term_1" :style="state[name].term_1 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
     <div class="term" id="term_2" :style="state[name].term_2 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
     <div :class="state[name].close ? 'middle_on' : 'middle_off'"></div>
+
     </div>
 </template>
