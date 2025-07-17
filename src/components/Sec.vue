@@ -52,13 +52,18 @@ const props = defineProps({
   }
 
   position: absolute;
+  cursor: pointer;
 }
 
-
+/* Ensure tooltips are visible */
+.sec:hover {
+  z-index: 1000;
+  filter: brightness(1.2);
+}
 </style>
 
 <template>
-  <div class="sec" :name="name">
+  <div class="sec" :name="name" :title="name">
     <div class="body" :style="state[name].close ? 'background-color:  var(--sec-on);':'background-color:  var(--off)'"></div>
     <div class="term" id="term_1" :style="state[name].term_1 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>
     <div class="term" id="term_2" :style="state[name].term_2 ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'"></div>

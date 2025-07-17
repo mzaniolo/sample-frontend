@@ -14,6 +14,6 @@ const props = defineProps({
 </style>
 
 <template>
-  <div class="v-line"  :style="e ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'">
+  <div class="v-line" :style="e ? 'background-color:  var(--line-on)':'background-color:  var(--line-off)'" title="Voltage Line">
   </div>
 </template>

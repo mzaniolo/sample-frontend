@@ -16,9 +16,12 @@ export const authConfig = {
     redirect_uri: `${getBaseUrl()}/#/callback`, // Dynamic redirect URI
     post_logout_redirect_uri: getBaseUrl(), // Dynamic post-logout redirect
 
+    // Project ID for the SCADA roles
+    project_id: '310606429645972425',
+
     // PKCE configuration
     response_type: 'code',
-    scope: 'openid profile email',
+    scope: `openid profile email urn:zitadel:iam:org:project:id:${project_id}:aud urn:zitadel:iam:org:projects:roles`,
 
     // Additional settings
     loadUserInfo: true,
